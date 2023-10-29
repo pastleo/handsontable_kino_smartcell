@@ -1,0 +1,45 @@
+#handsontable {
+  overflow: hidden;
+}
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: "Inter";
+  background-color: #ecf0ff;
+  padding: 8px 16px;
+  border: solid 1px #cad5e0;
+}
+.controls-row {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+@media (min-width: 600px) {
+  .controls-row {
+    flex-direction: row;
+  }
+}
+.controls label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #445668;
+  text-transform: uppercase;
+}
+.controls input[type=text] {
+  padding: 8px 12px;
+  background-color: #f8fafc;
+  font-size: 0.875rem;
+  border: 1px solid #e1e8f0;
+  border-radius: 0.5rem;
+  color: #445668;
+}
+.controls input[type=number] {
+  background-color: #f8fafc;
+  border: 1px solid #e1e8f0;
+  border-radius: 0.5rem;
+  color: #445668;
+}
+.controls input.short-number {
+  width: 3rem;
+}
