@@ -9,7 +9,7 @@ the package can be installed by adding `handsontable_kino_smartcell` to your lis
 ```elixir
 def deps do
   [
-    {:handsontable_kino_smartcell, git: "https://github.com/pastleo/handsontable_kino_smartcell.git", tag: "0.1.1"},
+    {:handsontable_kino_smartcell, git: "https://github.com/pastleo/handsontable_kino_smartcell.git", tag: "0.1.3"},
   ]
 end
 ```

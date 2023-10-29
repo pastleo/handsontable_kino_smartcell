@@ -21,18 +21,23 @@
   }
 }
 .controls label {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: #445668;
+}
+.controls .control-field.primary label {
+  font-size: 0.875rem;
   text-transform: uppercase;
 }
 .controls input[type=text] {
-  padding: 8px 12px;
   background-color: #f8fafc;
-  font-size: 0.875rem;
   border: 1px solid #e1e8f0;
   border-radius: 0.5rem;
   color: #445668;
+}
+.controls .control-field.primary input[type=text] {
+  padding: 8px 12px;
+  font-size: 0.875rem;
 }
 .controls input[type=number] {
   background-color: #f8fafc;
