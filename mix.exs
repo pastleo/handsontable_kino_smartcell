@@ -4,7 +4,7 @@ defmodule HandsontableKinoSmartcell.MixProject do
   def project do
     [
       app: :handsontable_kino_smartcell,
-      version: "0.1.4",
+      version: "0.1.5",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps()
