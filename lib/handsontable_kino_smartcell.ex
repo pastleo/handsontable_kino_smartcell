@@ -26,19 +26,17 @@ defmodule HandsontableKinoSmartcell do
   end
 
   def init(attrs, ctx) do
-    data = attrs["data"] || init_data(@init_data_size, @init_data_size)
     variable = Kino.SmartCell.prefixed_var_name("data", attrs["variable"])
-    file = attrs["file"]
-    config = attrs["config"] || %{}
 
     {
       :ok,
       assign(
         ctx,
-        data: data,
+        data: attrs["data"] || init_data(@init_data_size, @init_data_size),
         variable: variable,
-        file: file,
-        config: config
+        file: attrs["file"],
+        config: attrs["config"] || %{},
+        license_key: Application.get_env(:handsontable, :license_key)
       ),
       editor: [
         attribute: "elixir",
@@ -55,7 +53,8 @@ defmodule HandsontableKinoSmartcell do
        file: ctx.assigns.file,
        data: ctx.assigns.data,
        variable: ctx.assigns.variable,
-       config: ctx.assigns.config
+       config: ctx.assigns.config,
+       license_key: ctx.assigns.license_key
      }, ctx}
   end
 
@@ -127,13 +126,14 @@ defmodule HandsontableKinoSmartcell do
     |> (&(&1 <> "\n" <> elixir)).()
   end
 
-  def to_source(%{"variable" => variable, "data" => data, "elixir" => elixir} = attrs) do
-    quote do
-      unquote(quoted_var(variable)) = unquote(data)
-    end
-    |> to_source_variable(attrs)
+  def to_source(%{"data" => data, "elixir" => elixir} = attrs) do
+    to_source_variable(data, attrs)
     |> Kino.SmartCell.quoted_to_string()
     |> (&(&1 <> "\n" <> elixir)).()
+  end
+
+  defp init_data(rows, columns) do
+    Enum.map(1..rows, fn _x -> Enum.map(1..columns, fn _x -> "" end) end)
   end
 
   defp to_source_variable(data, %{"variable" => variable})
@@ -143,12 +143,7 @@ defmodule HandsontableKinoSmartcell do
     end
   end
 
-  defp to_source_variable(_attrs, data), do: data
+  defp to_source_variable(data, _attrs), do: data
 
-  defp init_data(rows, columns) do
-    Enum.map(1..rows, fn _x -> Enum.map(1..columns, fn _x -> nil end) end)
-  end
-
-  defp quoted_var(nil), do: nil
   defp quoted_var(string), do: {String.to_atom(string), [], nil}
 end
