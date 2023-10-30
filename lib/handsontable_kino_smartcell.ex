@@ -10,14 +10,10 @@ defmodule HandsontableKinoSmartcell do
   @impl true
   def init(%{"file" => file} = attrs, ctx) when is_binary(file) and byte_size(file) > 0 do
     try do
-      data =
-        File.stream!(file)
-        |> NimbleCSV.RFC4180.parse_stream(skip_headers: false)
-        |> Enum.to_list()
-
-      Map.delete(attrs, "file")
-      |> Map.put("data", data)
-      |> init(ctx)
+      File.stream!(file)
+      |> NimbleCSV.RFC4180.parse_stream(skip_headers: false)
+      |> Enum.to_list()
+      |> init_with(attrs, ctx)
     rescue
       err ->
         Logger.warning(err)
@@ -26,13 +22,17 @@ defmodule HandsontableKinoSmartcell do
   end
 
   def init(attrs, ctx) do
+    init_with(attrs["data"], attrs, ctx)
+  end
+
+  defp init_with(data, attrs, ctx) do
     variable = Kino.SmartCell.prefixed_var_name("data", attrs["variable"])
 
     {
       :ok,
       assign(
         ctx,
-        data: attrs["data"] || init_data(@init_data_size, @init_data_size),
+        data: data || init_data(@init_data_size, @init_data_size),
         variable: variable,
         file: attrs["file"],
         config: attrs["config"] || %{},
