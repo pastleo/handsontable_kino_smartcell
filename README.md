@@ -1,18 +1,30 @@
-# HandsontableKinoSmartcell
+# Handsontable Kino Smartcell
 
-use [Handsontable](https://handsontable.com/) to edit/enter data in [livebook](https://livebook.dev/), using livebook's [smart cells](https://news.livebook.dev/v0.6-automate-and-learn-with-smart-cells-mxJJe) feature
+use [Handsontable](https://handsontable.com/) to edit/enter data in [livebook](https://livebook.dev/) like excel/spreadsheet, created with livebook's [smart cell](https://hexdocs.pm/kino/Kino.SmartCell.html)
+
+![demo](docs/demo.png)
 
 ## Installation
 
-the package can be installed by adding `handsontable_kino_smartcell` to your list of dependencies in `mix.exs`:
+Add these lines to `Notebook dependencies and setup` to install package and set config
 
 ```elixir
-def deps do
-  [
-    {:handsontable_kino_smartcell, git: "https://github.com/pastleo/handsontable_kino_smartcell.git", tag: "0.1.3"},
+Mix.install([
+  {:handsontable_kino_smartcell, git: "https://github.com/pastleo/handsontable_kino_smartcell.git", tag: "0.1.4"},
+])
+
+Application.put_all_env(
+  handsontable: [
+    license_key: "non-commercial-and-evaluation",
   ]
-end
+)
 ```
+
+> about [Handsontable License key](https://handsontable.com/docs/javascript-data-grid/license-key/)
+
+then you can add `Handsontable` in `+ Smart` list:
+
+![adding](docs/adding.png)
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
