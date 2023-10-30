@@ -83,9 +83,10 @@ defmodule HandsontableKinoSmartcell do
   def to_attrs(%{assigns: %{file: file} = assigns} = ctx)
       when is_binary(file) and byte_size(file) > 0 do
     try do
-      NimbleCSV.RFC4180.dump_to_stream(assigns.data)
-      |> Stream.into(File.stream!(assigns.file, [:write, :utf8]))
-      |> Stream.run()
+      File.write(
+        assigns.file,
+        NimbleCSV.RFC4180.dump_to_iodata(assigns.data)
+      )
 
       %{
         "variable" => assigns.variable,
