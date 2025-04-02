@@ -26,6 +26,7 @@
   color: #445668;
 }
 .controls .control-field.primary label {
+  display: flex;
   font-size: 0.875rem;
   text-transform: uppercase;
 }
@@ -47,4 +48,73 @@
 }
 .controls input.short-number {
   width: 3rem;
+}
+
+.btn-primary {
+  background-color: #3e64ff;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #2a4cdb;
+}
+
+/* Style for the button when in error state */
+.btn-primary.error {
+  background-color: #dc3545; /* A standard red color for errors */
+  cursor: not-allowed;
+}
+
+.btn-primary.error:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+.error-message {
+  display: none;
+  color: #dc3545; /* Same red as the error button */
+}
+
+.error-message.shown {
+  display: block;
+}
+
+/* Input Group Styles */
+.input-group {
+  display: flex;
+  align-items: stretch; /* Make items same height */
+}
+
+.input-group input[type=text] {
+  flex-grow: 1; /* Allow input to take available space */
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  /* Ensure input border connects smoothly with button */
+  border-right: none;
+}
+
+.input-group .btn-primary {
+  margin-left: 0; /* Remove default margin */
+  border-radius: 0; /* Remove rounding for middle elements */
+}
+.input-group .btn-primary:disabled {
+  opacity: 0.8;
+}
+
+.input-group .btn-primary:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 0.5rem; /* Round top-right corner */
+  border-bottom-right-radius: 0.5rem; /* Round bottom-right corner */
+}
+
+/* Adjust hover/focus styles if needed */
+.input-group input[type=text]:focus {
+  z-index: 1; /* Bring focused input to front */
+  position: relative; /* Needed for z-index */
 }

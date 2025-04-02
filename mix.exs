@@ -4,7 +4,7 @@ defmodule HandsontableKinoSmartcell.MixProject do
   def project do
     [
       app: :handsontable_kino_smartcell,
-      version: "0.1.6",
+      version: "0.1.7",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -22,8 +22,8 @@ defmodule HandsontableKinoSmartcell.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:kino, "~> 0.11.0"},
-      {:nimble_csv, "~> 1.1"}
+      {:kino, "~> 0.15.3"},
+      {:nimble_csv, "~> 1.2.0"}
     ]
   end
 end

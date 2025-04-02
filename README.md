@@ -10,7 +10,7 @@ Add these lines to `Notebook dependencies and setup` to install package and set 
 
 ```elixir
 Mix.install([
-  {:handsontable_kino_smartcell, git: "https://github.com/pastleo/handsontable_kino_smartcell.git", tag: "0.1.6"},
+  {:handsontable_kino_smartcell, git: "https://github.com/pastleo/handsontable_kino_smartcell.git", tag: "0.1.7"},
 ])
 
 Application.put_all_env(

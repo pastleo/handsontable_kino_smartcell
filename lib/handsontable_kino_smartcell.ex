@@ -27,6 +27,7 @@ defmodule HandsontableKinoSmartcell do
 
   defp init_with(data, attrs, ctx) do
     variable = Kino.SmartCell.prefixed_var_name("data", attrs["variable"])
+    source = attrs["source"] || "IO.inspect(#{variable})\n:ok"
 
     {
       :ok,
@@ -36,12 +37,12 @@ defmodule HandsontableKinoSmartcell do
         variable: variable,
         file: attrs["file"],
         config: attrs["config"] || %{},
+        source: source,
         license_key: Application.get_env(:handsontable, :license_key)
       ),
       editor: [
-        attribute: "elixir",
         language: "elixir",
-        default_source: "IO.inspect(#{variable})\n:ok"
+        source: source,
       ]
     }
   end
@@ -79,37 +80,77 @@ defmodule HandsontableKinoSmartcell do
     {:noreply, assign(ctx, config: config)}
   end
 
-  @impl true
-  def to_attrs(%{assigns: %{file: file} = assigns} = ctx)
+  def handle_event("save_file", data, %{assigns: %{file: file}} = ctx)
       when is_binary(file) and byte_size(file) > 0 do
     try do
-      File.write(
-        assigns.file,
-        NimbleCSV.RFC4180.dump_to_iodata(assigns.data)
+      File.write!(
+        file,
+        NimbleCSV.RFC4180.dump_to_iodata(data)
       )
-
-      %{
-        "variable" => assigns.variable,
-        "file" => assigns.file,
-        "config" => assigns.config
-      }
+      broadcast_event(ctx, "save_success", %{})
+      {:noreply, assign(ctx, data: data)}
     rescue
       err ->
-        Logger.warning(err)
-        to_attrs(put_in(ctx, [:assigns, :file], nil))
+        Logger.warning(Exception.format(:error, err, __STACKTRACE__))
+        broadcast_event(ctx, "save_error", %{message: Exception.message(err)})
+        {:noreply, ctx}
     end
+  end
+
+  def handle_event("save_file", _data, ctx) do
+    {:noreply, ctx}
+  end
+
+  def handle_event("read_file", %{}, %{assigns: %{file: file}} = ctx)
+      when is_binary(file) and byte_size(file) > 0 do
+    try do
+      data =
+        File.stream!(file)
+        |> NimbleCSV.RFC4180.parse_stream(skip_headers: false)
+        |> Enum.to_list()
+
+      broadcast_event(ctx, "read_success", %{data: data})
+      {:noreply, assign(ctx, data: data)}
+    rescue
+      err ->
+        Logger.warning(Exception.format(:error, err, __STACKTRACE__))
+        broadcast_event(ctx, "read_error", %{message: Exception.message(err)})
+        {:noreply, ctx}
+    end
+  end
+
+  def handle_event("read_file", %{}, ctx) do
+    # Ignore if file is not set
+    {:noreply, ctx}
+  end
+
+  @impl true
+  def handle_editor_change(source, ctx) do
+    {:ok, assign(ctx, source: source)}
+  end
+
+  @impl true
+  def to_attrs(%{assigns: %{file: file} = assigns})
+      when is_binary(file) and byte_size(file) > 0 do
+    %{
+      "variable" => assigns.variable,
+      "file" => file,
+      "config" => assigns.config,
+      "source" => assigns.source
+    }
   end
 
   def to_attrs(ctx) do
     %{
       "data" => ctx.assigns.data,
       "variable" => ctx.assigns.variable,
-      "config" => ctx.assigns.config
+      "config" => ctx.assigns.config,
+      "source" => ctx.assigns.source
     }
   end
 
   @impl true
-  def to_source(%{"file" => file, "elixir" => elixir} = attrs)
+  def to_source(%{"file" => file, "source" => source} = attrs)
       when is_binary(file) and byte_size(file) > 0 do
     quote do
       try do
@@ -124,13 +165,13 @@ defmodule HandsontableKinoSmartcell do
     end
     |> to_source_variable(attrs)
     |> Kino.SmartCell.quoted_to_string()
-    |> (&(&1 <> "\n" <> elixir)).()
+    |> (&(&1 <> "\n" <> source)).()
   end
 
-  def to_source(%{"data" => data, "elixir" => elixir} = attrs) do
+  def to_source(%{"data" => data, "source" => source} = attrs) do
     to_source_variable(data, attrs)
     |> Kino.SmartCell.quoted_to_string()
-    |> (&(&1 <> "\n" <> elixir)).()
+    |> (&(&1 <> "\n" <> source)).()
   end
 
   defp init_data(rows, columns) do
