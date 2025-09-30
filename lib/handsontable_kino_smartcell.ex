@@ -42,7 +42,7 @@ defmodule HandsontableKinoSmartcell do
       ),
       editor: [
         language: "elixir",
-        source: source,
+        source: source
       ]
     }
   end
@@ -87,6 +87,7 @@ defmodule HandsontableKinoSmartcell do
         file,
         NimbleCSV.RFC4180.dump_to_iodata(data)
       )
+
       broadcast_event(ctx, "save_success", %{})
       {:noreply, assign(ctx, data: data)}
     rescue
@@ -152,9 +153,18 @@ defmodule HandsontableKinoSmartcell do
   @impl true
   def to_source(%{"file" => file, "source" => source} = attrs)
       when is_binary(file) and byte_size(file) > 0 do
+    file_path =
+      if Path.type(file) == :absolute do
+        file
+      else
+        quote do
+          Path.join(__DIR__, unquote(file))
+        end
+      end
+
     quote do
       try do
-        File.stream!(unquote(file))
+        File.stream!(unquote(file_path))
         |> NimbleCSV.RFC4180.parse_stream(skip_headers: false)
         |> Enum.to_list()
       rescue
