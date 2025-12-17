@@ -38,7 +38,9 @@ defmodule HandsontableKinoSmartcell do
         file: attrs["file"],
         config: attrs["config"] || %{},
         source: source,
-        license_key: Application.get_env(:handsontable, :license_key)
+        license_key: Application.get_env(:handsontable, :license_key),
+        theme: Application.get_env(:handsontable, :theme, "ht-theme-main"),
+        theme_css: Application.get_env(:handsontable, :theme_css, "https://cdn.jsdelivr.net/npm/handsontable@16.2.0/styles/ht-theme-main.min.css")
       ),
       editor: [
         language: "elixir",
@@ -55,7 +57,9 @@ defmodule HandsontableKinoSmartcell do
        data: ctx.assigns.data,
        variable: ctx.assigns.variable,
        config: ctx.assigns.config,
-       license_key: ctx.assigns.license_key
+       license_key: ctx.assigns.license_key,
+       theme: ctx.assigns.theme,
+       theme_css: ctx.assigns.theme_css
      }, ctx}
   end
 

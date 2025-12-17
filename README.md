@@ -16,11 +16,14 @@ Mix.install([
 Application.put_all_env(
   handsontable: [
     license_key: "non-commercial-and-evaluation",
+    # theme: "ht-theme-classic",
+    # theme_css: "https://cdn.jsdelivr.net/npm/handsontable@16.2.0/styles/ht-theme-classic.min.css",
   ]
 )
 ```
 
-> about [Handsontable License key](https://handsontable.com/docs/javascript-data-grid/license-key/)
+> about [Handsontable license key](https://handsontable.com/docs/javascript-data-grid/license-key/)
+> about [theme](https://handsontable.com/docs/javascript-data-grid/themes/)
 
 then you can add `Handsontable` in `+ Smart` list:
 
