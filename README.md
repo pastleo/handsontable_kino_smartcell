@@ -20,7 +20,7 @@ Application.put_all_env(
 )
 
 Mix.install([
-  {:handsontable_kino_smartcell, git: "https://github.com/pastleo/handsontable_kino_smartcell.git", tag: "0.1.8"},
+  {:handsontable_kino_smartcell, git: "https://github.com/pastleo/handsontable_kino_smartcell.git", tag: "0.1.9"},
 ])
 ```
 
