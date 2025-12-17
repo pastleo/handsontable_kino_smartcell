@@ -10,14 +10,15 @@ defmodule HandsontableKinoSmartcell do
   @impl true
   def init(%{"file" => file} = attrs, ctx) when is_binary(file) and byte_size(file) > 0 do
     try do
-      File.stream!(file)
+      resolve_file_path(file)
+      |> File.stream!()
       |> NimbleCSV.RFC4180.parse_stream(skip_headers: false)
       |> Enum.to_list()
       |> init_with(attrs, ctx)
     rescue
       err ->
         Logger.warning(err)
-        init(Map.delete(attrs, "file"), ctx)
+        init_with(nil, attrs, ctx)
     end
   end
 
@@ -37,10 +38,7 @@ defmodule HandsontableKinoSmartcell do
         variable: variable,
         file: attrs["file"],
         config: attrs["config"] || %{},
-        source: source,
-        license_key: Application.get_env(:handsontable, :license_key),
-        theme: Application.get_env(:handsontable, :theme, "ht-theme-main"),
-        theme_css: Application.get_env(:handsontable, :theme_css, "https://cdn.jsdelivr.net/npm/handsontable@16.2.0/styles/ht-theme-main.min.css")
+        source: source
       ),
       editor: [
         language: "elixir",
@@ -57,9 +55,13 @@ defmodule HandsontableKinoSmartcell do
        data: ctx.assigns.data,
        variable: ctx.assigns.variable,
        config: ctx.assigns.config,
-       license_key: ctx.assigns.license_key,
-       theme: ctx.assigns.theme,
-       theme_css: ctx.assigns.theme_css
+       license_key: Application.get_env(:handsontable, :license_key),
+       theme: Application.get_env(:handsontable, :theme, "ht-theme-main"),
+       theme_css: Application.get_env(
+           :handsontable,
+           :theme_css,
+           "https://cdn.jsdelivr.net/npm/handsontable@16.2.0/styles/ht-theme-main.min.css"
+         )
      }, ctx}
   end
 
@@ -87,8 +89,8 @@ defmodule HandsontableKinoSmartcell do
   def handle_event("save_file", data, %{assigns: %{file: file}} = ctx)
       when is_binary(file) and byte_size(file) > 0 do
     try do
-      File.write!(
-        file,
+      resolve_file_path(file)
+      |> File.write!(
         NimbleCSV.RFC4180.dump_to_iodata(data)
       )
 
@@ -109,8 +111,10 @@ defmodule HandsontableKinoSmartcell do
   def handle_event("read_file", %{}, %{assigns: %{file: file}} = ctx)
       when is_binary(file) and byte_size(file) > 0 do
     try do
+
       data =
-        File.stream!(file)
+        resolve_file_path(file)
+        |> File.stream!()
         |> NimbleCSV.RFC4180.parse_stream(skip_headers: false)
         |> Enum.to_list()
 
@@ -157,25 +161,12 @@ defmodule HandsontableKinoSmartcell do
   @impl true
   def to_source(%{"file" => file, "source" => source} = attrs)
       when is_binary(file) and byte_size(file) > 0 do
-    file_path =
-      if Path.type(file) == :absolute do
-        file
-      else
-        quote do
-          Path.join(__DIR__, unquote(file))
-        end
-      end
+    file_path = resolve_file_path(file)
 
     quote do
-      try do
-        File.stream!(unquote(file_path))
-        |> NimbleCSV.RFC4180.parse_stream(skip_headers: false)
-        |> Enum.to_list()
-      rescue
-        err ->
-          Logger.warning(err)
-          nil
-      end
+      File.stream!(unquote(file_path))
+      |> NimbleCSV.RFC4180.parse_stream(skip_headers: false)
+      |> Enum.to_list()
     end
     |> to_source_variable(attrs)
     |> Kino.SmartCell.quoted_to_string()
@@ -186,6 +177,20 @@ defmodule HandsontableKinoSmartcell do
     to_source_variable(data, attrs)
     |> Kino.SmartCell.quoted_to_string()
     |> (&(&1 <> "\n" <> source)).()
+  end
+
+  defp resolve_file_path(file) do
+    case Application.get_env(:handsontable, :working_dir) do
+      nil ->
+        file
+
+      working_dir when is_binary(working_dir) ->
+        if Path.type(file) == :absolute do
+          file
+        else
+          Path.join(working_dir, file)
+        end
+    end
   end
 
   defp init_data(rows, columns) do
