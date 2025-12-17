@@ -9,11 +9,10 @@ use [Handsontable](https://handsontable.com/) to edit/enter data in [livebook](h
 Add these lines to `Notebook dependencies and setup` to install package and set config
 
 ```elixir
-livemd_dir = Path.dirname(__ENV__.file)
 Application.put_all_env(
   handsontable: [
     license_key: "non-commercial-and-evaluation",
-    working_dir: livemd_dir,
+    working_dir: __DIR__,
     # theme: "ht-theme-classic",
     # theme_css: "https://cdn.jsdelivr.net/npm/handsontable@16.2.0/styles/ht-theme-classic.min.css",
   ]
